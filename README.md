@@ -1,28 +1,33 @@
 # 🌟 GlowUp Backend
 
-A modern and professional REST API backend project built with Express.js, featuring a clean architecture with controller-service pattern, comprehensive validation, and robust error handling.
+A modern and professional REST API backend project built with Express.js and PostgreSQL, featuring a clean architecture with controller-service pattern, comprehensive validation, and robust error handling.
 
 ## 🚀 Features
 
 - ✅ RESTful API design
 - ✅ CRUD operations (Create, Read, Update, Delete)
+- ✅ **PostgreSQL database integration** with persistent storage
 - ✅ Professional project structure (Controller-Service pattern)
 - ✅ Standardized response format
 - ✅ Request logging middleware
-- ✅ **Input validation middleware**
-- ✅ **Global error handling**
-- ✅ **Route validation (ID parameters)**
-- ✅ **Data sanitization**
+- ✅ Input validation middleware
+- ✅ Global error handling
+- ✅ Route validation (ID parameters)
+- ✅ Data sanitization
 - ✅ 404 handler for undefined routes
+- ✅ Environment variables (.env)
+- ✅ Docker-ready PostgreSQL setup
 
 ## 📂 Project Structure
 
 ```
 glowup-backend/
+├── config/
+│   └── database.js              # PostgreSQL connection pool
 ├── controllers/
 │   └── user.controller.js       # Request/Response logic
 ├── services/
-│   └── user.service.js          # Business logic & data management
+│   └── user.service.js          # Business logic & database queries
 ├── routes/
 │   └── user.routes.js           # API endpoint definitions
 ├── middlewares/
@@ -31,6 +36,8 @@ glowup-backend/
 │   └── errorHandler.js          # Global error handling
 ├── utils/
 │   └── response.js              # Standardized response helper
+├── .env                         # Environment variables (not in git)
+├── .gitignore
 ├── app.js                       # Express app configuration
 ├── server.js                    # Server entry point
 ├── package.json
@@ -41,27 +48,94 @@ glowup-backend/
 
 - **Node.js** - JavaScript runtime
 - **Express.js** - Web framework
-- **JavaScript** - Programming language
+- **PostgreSQL** - Relational database
+- **pg** - PostgreSQL client for Node.js
+- **dotenv** - Environment variable management
 
 ## 📦 Installation
 
-1. Clone the repository:
+### Prerequisites
+
+- Node.js (v14 or higher)
+- PostgreSQL (v12 or higher) or Docker
+
+### 1. Clone the repository:
 ```bash
 git clone https://github.com/bilgenurpala/glowup-backend.git
 cd glowup-backend
 ```
 
-2. Install dependencies:
+### 2. Install dependencies:
 ```bash
 npm install
 ```
 
-3. Start the server:
+### 3. Setup PostgreSQL:
+
+**Option A: Using Docker (Recommended)**
+```bash
+docker run --name glowup-postgres \
+  -e POSTGRES_PASSWORD=mysecretpassword \
+  -e POSTGRES_DB=glowup_db \
+  -p 5432:5432 \
+  -d postgres:14
+```
+
+**Option B: Local PostgreSQL Installation**
+- Install PostgreSQL from https://www.postgresql.org/download/
+- Create database:
+```bash
+psql -U postgres
+CREATE DATABASE glowup_db;
+\q
+```
+
+### 4. Create Users Table:
+```bash
+docker exec -it glowup-postgres psql -U postgres -d glowup_db
+```
+
+```sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+\q
+```
+
+### 5. Environment Variables:
+
+Create `.env` file in the root directory:
+
+```env
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=mysecretpassword
+DB_NAME=glowup_db
+```
+
+**⚠️ Important:** Update `DB_PASSWORD` with your actual PostgreSQL password!
+
+### 6. Start the server:
 ```bash
 npm run dev
 ```
 
 The server will run at `http://localhost:3000`
+
+You should see:
+```
+✅ Connected to PostgreSQL database
+Server running on port 3000
+```
 
 ## 📡 API Endpoints
 
@@ -95,8 +169,8 @@ Content-Type: application/json
   "data": {
     "id": 1,
     "name": "Bilge",
-    "createdAt": "2025-01-26T10:30:00.000Z",
-    "updatedAt": "2025-01-26T10:30:00.000Z"
+    "created_at": "2025-01-27T10:30:00.000Z",
+    "updated_at": "2025-01-27T10:30:00.000Z"
   }
 }
 ```
@@ -115,6 +189,22 @@ Content-Type: application/json
 ```bash
 DELETE /users/1
 ```
+
+**Get All Users:**
+```bash
+GET /users
+```
+
+## 🗃️ Database Schema
+
+### Users Table
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | SERIAL | PRIMARY KEY |
+| name | VARCHAR(50) | NOT NULL |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
 
 ## 📋 Response Format
 
@@ -215,7 +305,7 @@ Response (404):
 
 ## 🧪 Testing
 
-You can test the project using Postman or curl.
+You can test the project using Postman, Thunder Client, or curl.
 
 **Example with curl:**
 ```bash
@@ -243,9 +333,9 @@ curl -X POST http://localhost:3000/users \
 
 ## 🏗️ Architecture
 
-### Middleware Flow:
+### Data Flow:
 ```
-Request → Logger → Route → Validation → Controller → Service → Response
+Request → Logger → Route → Validation → Controller → Service → PostgreSQL
                                 ↓
                           Error Handler (if error)
 ```
@@ -264,15 +354,23 @@ Request → Logger → Route → Validation → Controller → Service → Respo
 
 3. **Controller Layer** (`controllers/`)
    - Handles HTTP request/response
+   - Performs input validation
    - Calls appropriate service methods
    - Returns standardized responses
+   - All methods are async (await service calls)
 
 4. **Service Layer** (`services/`)
    - Contains business logic
-   - Manages data operations
+   - Executes database queries using parameterized statements
    - Independent of HTTP layer (reusable)
+   - Returns data or null
 
-5. **Utils Layer** (`utils/`)
+5. **Database Layer** (`config/`)
+   - PostgreSQL connection pool
+   - Connection error handling
+   - Environment-based configuration
+
+6. **Utils Layer** (`utils/`)
    - Helper functions
    - Response formatters
 
@@ -284,7 +382,15 @@ The application includes comprehensive error handling:
 - **404 Handler**: Returns proper response for undefined routes
 - **Validation Errors**: Returns 400 status with descriptive messages
 - **Not Found Errors**: Returns 404 status when resource doesn't exist
-- **Try-Catch Blocks**: All controllers wrapped in try-catch
+- **Database Errors**: Caught and forwarded to error handler
+- **Try-Catch Blocks**: All async controllers wrapped in try-catch
+
+## 🔐 Security Features
+
+- **SQL Injection Prevention**: Parameterized queries ($1, $2, etc.)
+- **Environment Variables**: Sensitive data in .env (not in git)
+- **Input Validation**: All user inputs validated before processing
+- **Data Sanitization**: Trimming whitespace, type checking
 
 ## 📊 Request Logging
 
@@ -296,10 +402,44 @@ Every request is automatically logged with:
 
 Example log output:
 ```
-GET /users -> 200 (5ms)
-POST /users -> 201 (12ms)
-PUT /users/1 -> 200 (8ms)
-DELETE /users/999 -> 404 (3ms)
+✅ Connected to PostgreSQL database
+Server running on port 3000
+GET /users -> 200 (12ms)
+POST /users -> 201 (28ms)
+PUT /users/1 -> 200 (15ms)
+DELETE /users/999 -> 404 (8ms)
+```
+
+## 🐳 Docker Usage
+
+### Start PostgreSQL Container:
+```bash
+docker start glowup-postgres
+```
+
+### Stop PostgreSQL Container:
+```bash
+docker stop glowup-postgres
+```
+
+### View Container Logs:
+```bash
+docker logs glowup-postgres
+```
+
+### Access PostgreSQL Shell:
+```bash
+docker exec -it glowup-postgres psql -U postgres -d glowup_db
+```
+
+### Backup Database:
+```bash
+docker exec glowup-postgres pg_dump -U postgres glowup_db > backup.sql
+```
+
+### Restore Database:
+```bash
+docker exec -i glowup-postgres psql -U postgres -d glowup_db < backup.sql
 ```
 
 ## 🎯 Development Roadmap
@@ -311,11 +451,14 @@ DELETE /users/999 -> 404 (3ms)
 - [x] Global error handling
 - [x] Request logging
 - [x] Standardized responses
+- [x] **PostgreSQL database integration**
+- [x] **Environment variables**
+- [x] **Persistent data storage**
+- [x] **Docker setup**
 
 ### In Progress 🔄
-- [ ] Database integration (MongoDB/PostgreSQL)
 - [ ] Authentication (JWT)
-- [ ] Environment variables (.env)
+- [ ] User roles and permissions
 
 ### Planned 📋
 - [ ] Advanced validation library (Joi/Zod)
@@ -325,14 +468,24 @@ DELETE /users/999 -> 404 (3ms)
 - [ ] Rate limiting
 - [ ] CORS configuration
 - [ ] Security headers (Helmet.js)
-- [ ] Request rate limiting
-- [ ] Pagination
+- [ ] Password hashing (bcrypt)
+- [ ] Email service
+- [ ] File upload support
+- [ ] Pagination improvements
 - [ ] Filtering and sorting
 - [ ] API versioning
+- [ ] Database migrations
+- [ ] Seeding scripts
 
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 👤 Developer
 
@@ -344,6 +497,14 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License.
 
+## 🙏 Acknowledgments
+
+- Express.js community
+- PostgreSQL team
+- Node.js contributors
+
 ---
 
 ⭐ If you find this project helpful, please give it a star!
+
+**Built with ❤️ using Node.js, Express.js, and PostgreSQL**
