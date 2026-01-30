@@ -1,22 +1,28 @@
-# 🌟 GlowUp Backend
+# 🌟 GlowUp Backend API
 
-A modern and professional REST API backend project built with Express.js and PostgreSQL, featuring a clean architecture with controller-service pattern, comprehensive validation, and robust error handling.
+A modern, production-ready REST API backend built with **Node.js**, **Express.js**, **PostgreSQL**, and **JWT Authentication**. Features a clean MVC architecture, comprehensive validation, robust error handling, and Docker containerization.
 
-## 🚀 Features
+## 🚀 Key Features
 
-- ✅ RESTful API design
-- ✅ CRUD operations (Create, Read, Update, Delete)
-- ✅ **PostgreSQL database integration** with persistent storage
-- ✅ Professional project structure (Controller-Service pattern)
-- ✅ Standardized response format
-- ✅ Request logging middleware
-- ✅ Input validation middleware
-- ✅ Global error handling
-- ✅ Route validation (ID parameters)
-- ✅ Data sanitization
-- ✅ 404 handler for undefined routes
-- ✅ Environment variables (.env)
-- ✅ Docker-ready PostgreSQL setup
+### Core Features
+- ✅ **RESTful API** design following industry best practices
+- ✅ **CRUD operations** (Create, Read, Update, Delete)
+- ✅ **PostgreSQL database** with persistent data storage
+- ✅ **JWT Authentication** with secure token-based auth
+- ✅ **Password hashing** using bcrypt
+- ✅ **Protected routes** with authentication middleware
+- ✅ **Docker Compose** for easy deployment
+- ✅ **Environment variables** for secure configuration
+
+### Architecture & Code Quality
+- ✅ **MVC Pattern** (Controller-Service architecture)
+- ✅ **Separation of concerns** across layers
+- ✅ **Standardized API responses** with success/error formatting
+- ✅ **Input validation** middleware
+- ✅ **Global error handling** with detailed error messages
+- ✅ **Request logging** middleware
+- ✅ **SQL injection prevention** with parameterized queries
+- ✅ **Data sanitization** and type checking
 
 ## 📂 Project Structure
 
@@ -25,19 +31,25 @@ glowup-backend/
 ├── config/
 │   └── database.js              # PostgreSQL connection pool
 ├── controllers/
-│   └── user.controller.js       # Request/Response logic
+│   ├── auth.controller.js       # Authentication logic (register, login)
+│   └── user.controller.js       # User management logic
 ├── services/
-│   └── user.service.js          # Business logic & database queries
+│   ├── auth.service.js          # Auth business logic & DB queries
+│   └── user.service.js          # User business logic & DB queries
 ├── routes/
-│   └── user.routes.js           # API endpoint definitions
+│   ├── auth.routes.js           # Authentication endpoints
+│   └── user.routes.js           # User management endpoints
 ├── middlewares/
-│   ├── logger.js                # Request logging
+│   ├── authMiddleware.js        # JWT token verification
 │   ├── validateUser.js          # Input validation
+│   ├── logger.js                # Request logging
 │   └── errorHandler.js          # Global error handling
 ├── utils/
 │   └── response.js              # Standardized response helper
 ├── .env                         # Environment variables (not in git)
 ├── .gitignore
+├── docker-compose.yml           # Docker services configuration
+├── Dockerfile                   # API container definition
 ├── app.js                       # Express app configuration
 ├── server.js                    # Server entry point
 ├── package.json
@@ -46,90 +58,85 @@ glowup-backend/
 
 ## 🛠️ Technologies
 
-- **Node.js** - JavaScript runtime
-- **Express.js** - Web framework
-- **PostgreSQL** - Relational database
-- **pg** - PostgreSQL client for Node.js
-- **dotenv** - Environment variable management
+| Technology | Purpose |
+|------------|---------|
+| **Node.js** | JavaScript runtime environment |
+| **Express.js** | Web application framework |
+| **PostgreSQL** | Relational database |
+| **JWT** | JSON Web Tokens for authentication |
+| **bcrypt** | Password hashing and verification |
+| **pg** | PostgreSQL client for Node.js |
+| **dotenv** | Environment variable management |
+| **Docker** | Containerization platform |
+| **Docker Compose** | Multi-container orchestration |
 
-## 📦 Installation
+## 📦 Installation & Setup
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
-- PostgreSQL (v12 or higher) or Docker
+- **Docker** and **Docker Compose** installed
+- **Node.js** v18+ (for local development)
+- **Git**
 
-### 1. Clone the repository:
+### Quick Start with Docker (Recommended)
+
+1. **Clone the repository:**
 ```bash
 git clone https://github.com/bilgenurpala/glowup-backend.git
 cd glowup-backend
 ```
 
-### 2. Install dependencies:
+2. **Create `.env` file:**
 ```bash
-npm install
+# Copy and edit with your values
+cp .env.example .env
 ```
 
-### 3. Setup PostgreSQL:
-
-**Option A: Using Docker (Recommended)**
-```bash
-docker run --name glowup-postgres \
-  -e POSTGRES_PASSWORD=mysecretpassword \
-  -e POSTGRES_DB=glowup_db \
-  -p 5432:5432 \
-  -d postgres:14
-```
-
-**Option B: Local PostgreSQL Installation**
-- Install PostgreSQL from https://www.postgresql.org/download/
-- Create database:
-```bash
-psql -U postgres
-CREATE DATABASE glowup_db;
-\q
-```
-
-### 4. Create Users Table:
-```bash
-docker exec -it glowup-postgres psql -U postgres -d glowup_db
-```
-
-```sql
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(50) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-\q
-```
-
-### 5. Environment Variables:
-
-Create `.env` file in the root directory:
-
+Or create `.env` manually:
 ```env
 # Server Configuration
 PORT=3000
 NODE_ENV=development
 
 # Database Configuration
-DB_HOST=localhost
+DB_HOST=db
 DB_PORT=5432
 DB_USER=postgres
-DB_PASSWORD=mysecretpassword
-DB_NAME=glowup_db
+DB_PASSWORD=postgres123
+DB_NAME=appdb
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-12345
+JWT_EXPIRES_IN=7d
 ```
 
-**⚠️ Important:** Update `DB_PASSWORD` with your actual PostgreSQL password!
-
-### 6. Start the server:
+3. **Start with Docker Compose:**
 ```bash
-npm run dev
+docker-compose up -d
 ```
 
-The server will run at `http://localhost:3000`
+4. **Create database table:**
+```bash
+docker exec -it postgres-db psql -U postgres -d appdb
+```
+
+Then run:
+```sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) NOT NULL,
+  email VARCHAR(255) UNIQUE,
+  password VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+\q
+```
+
+5. **Verify everything is running:**
+```bash
+docker-compose logs -f api
+```
 
 You should see:
 ```
@@ -137,27 +144,69 @@ You should see:
 Server running on port 3000
 ```
 
+6. **Test the API:**
+```bash
+curl http://localhost:3000/users
+```
+
+### Local Development (Without Docker)
+
+1. **Install PostgreSQL locally**
+
+2. **Create database:**
+```bash
+psql -U postgres
+CREATE DATABASE glowup_db;
+\q
+```
+
+3. **Install dependencies:**
+```bash
+npm install
+```
+
+4. **Update `.env` for local setup:**
+```env
+DB_HOST=localhost
+```
+
+5. **Run the server:**
+```bash
+npm run dev
+```
+
 ## 📡 API Endpoints
 
-### Users
+### Authentication Endpoints
 
-| Method | Endpoint | Description | Validation |
-|--------|----------|-------------|------------|
-| GET | `/users` | Get all users | Query param: limit (optional) |
-| GET | `/users?limit=10` | Get first 10 users | Limit must be a number |
-| POST | `/users` | Create a new user | Name required (2-50 chars) |
-| PUT | `/users/:id` | Update a user | Valid ID + Name (2-50 chars) |
-| DELETE | `/users/:id` | Delete a user | Valid ID required |
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/auth/register` | Register new user | No |
+| POST | `/auth/login` | Login and get JWT token | No |
+| GET | `/auth/me` | Get current user profile | Yes |
 
-### Example Requests
+### User Management Endpoints
 
-**Create User:**
-```bash
-POST /users
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/users` | Get all users (with optional limit) | No |
+| POST | `/users` | Create a new user | No |
+| PUT | `/users/:id` | Update user by ID | Yes |
+| DELETE | `/users/:id` | Delete user by ID | Yes |
+
+## 📖 API Documentation
+
+### 1. Register a New User
+
+**Request:**
+```http
+POST /auth/register
 Content-Type: application/json
 
 {
-  "name": "Bilge"
+  "name": "Bilge Nur",
+  "email": "bilge@example.com",
+  "password": "securePassword123"
 }
 ```
 
@@ -165,34 +214,178 @@ Content-Type: application/json
 ```json
 {
   "success": true,
-  "message": "User created",
+  "message": "User registered successfully",
   "data": {
     "id": 1,
-    "name": "Bilge",
-    "created_at": "2025-01-27T10:30:00.000Z",
-    "updated_at": "2025-01-27T10:30:00.000Z"
+    "name": "Bilge Nur",
+    "email": "bilge@example.com",
+    "created_at": "2025-01-29T10:30:00.000Z",
+    "updated_at": "2025-01-29T10:30:00.000Z"
   }
 }
 ```
 
-**Update User:**
-```bash
-PUT /users/1
+**Validation Rules:**
+- Name: Required, 2-50 characters
+- Email: Required, valid email format, unique
+- Password: Required, minimum 6 characters
+
+---
+
+### 2. Login
+
+**Request:**
+```http
+POST /auth/login
 Content-Type: application/json
 
 {
-  "name": "Bilge Nur"
+  "email": "bilge@example.com",
+  "password": "securePassword123"
 }
 ```
 
-**Delete User:**
-```bash
-DELETE /users/1
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": 1,
+      "name": "Bilge Nur",
+      "email": "bilge@example.com",
+      "created_at": "2025-01-29T10:30:00.000Z",
+      "updated_at": "2025-01-29T10:30:00.000Z"
+    },
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
 ```
 
-**Get All Users:**
-```bash
+**Note:** Save the `token` for authenticated requests!
+
+---
+
+### 3. Get Current User Profile (Protected)
+
+**Request:**
+```http
+GET /auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "User profile fetched successfully",
+  "data": {
+    "id": 1,
+    "name": "Bilge Nur",
+    "email": "bilge@example.com",
+    "created_at": "2025-01-29T10:30:00.000Z",
+    "updated_at": "2025-01-29T10:30:00.000Z"
+  }
+}
+```
+
+---
+
+### 4. Get All Users
+
+**Request:**
+```http
 GET /users
+GET /users?limit=10
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Users retrieved successfully",
+  "data": [
+    {
+      "id": 1,
+      "name": "Bilge Nur",
+      "email": "bilge@example.com",
+      "created_at": "2025-01-29T10:30:00.000Z",
+      "updated_at": "2025-01-29T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+### 5. Update User (Protected)
+
+**Request:**
+```http
+PUT /users/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "name": "Bilge Nur Pala"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "User updated",
+  "data": {
+    "id": 1,
+    "name": "Bilge Nur Pala",
+    "email": "bilge@example.com",
+    "created_at": "2025-01-29T10:30:00.000Z",
+    "updated_at": "2025-01-29T12:45:00.000Z"
+  }
+}
+```
+
+---
+
+### 6. Delete User (Protected)
+
+**Request:**
+```http
+DELETE /users/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "User deleted",
+  "data": {
+    "id": 1,
+    "name": "Bilge Nur",
+    "email": "bilge@example.com",
+    "created_at": "2025-01-29T10:30:00.000Z",
+    "updated_at": "2025-01-29T10:30:00.000Z"
+  }
+}
+```
+
+## 🔒 Authentication Flow
+
+```
+1. Register
+   POST /auth/register → User created in database (password hashed)
+
+2. Login
+   POST /auth/login → Verify credentials → Generate JWT token
+   
+3. Access Protected Routes
+   Add header: Authorization: Bearer <token>
+   
+4. Token Verification
+   Middleware validates token → Extract user info → Allow access
 ```
 
 ## 🗃️ Database Schema
@@ -203,21 +396,27 @@ GET /users
 |--------|------|-------------|
 | id | SERIAL | PRIMARY KEY |
 | name | VARCHAR(50) | NOT NULL |
+| email | VARCHAR(255) | UNIQUE |
+| password | VARCHAR(255) | - |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
 | updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
 
-## 📋 Response Format
+**Indexes:**
+- Primary Key on `id`
+- Unique constraint on `email`
 
-### Success Response:
+## 🎨 Response Format
+
+### Success Response
 ```json
 {
   "success": true,
   "message": "Operation successful",
-  "data": {...}
+  "data": { ... }
 }
 ```
 
-### Error Response:
+### Error Response
 ```json
 {
   "success": false,
@@ -226,40 +425,10 @@ GET /users
 }
 ```
 
-## ✅ Validation Rules
+## ⚠️ Error Examples
 
-### User Name:
-- ✅ Required field
-- ✅ Must be a string
-- ✅ Minimum 2 characters
-- ✅ Maximum 50 characters
-- ✅ Automatically trimmed (whitespace removed)
-
-### User ID:
-- ✅ Must be a positive integer
-- ✅ Must be greater than 0
-
-### Validation Error Examples:
-
-**Missing Name:**
+### 400 - Validation Error
 ```json
-POST /users
-{}
-
-Response (400):
-{
-  "success": false,
-  "message": "Name is required",
-  "errors": null
-}
-```
-
-**Name Too Short:**
-```json
-POST /users
-{"name": "A"}
-
-Response (400):
 {
   "success": false,
   "message": "Name must be at least 2 characters",
@@ -267,23 +436,26 @@ Response (400):
 }
 ```
 
-**Invalid ID:**
+### 401 - Unauthorized (No Token)
 ```json
-PUT /users/abc
-
-Response (400):
 {
   "success": false,
-  "message": "Invalid user ID",
+  "message": "Access token is required",
   "errors": null
 }
 ```
 
-**User Not Found:**
+### 403 - Forbidden (Invalid Token)
 ```json
-DELETE /users/999
+{
+  "success": false,
+  "message": "Invalid token",
+  "errors": null
+}
+```
 
-Response (404):
+### 404 - Not Found
+```json
 {
   "success": false,
   "message": "User not found",
@@ -291,201 +463,259 @@ Response (404):
 }
 ```
 
-**Route Not Found:**
+### 409 - Conflict (Duplicate Email)
 ```json
-GET /invalid-route
-
-Response (404):
 {
   "success": false,
-  "message": "Route not found",
+  "message": "Email already registered",
   "errors": null
 }
 ```
 
 ## 🧪 Testing
 
-You can test the project using Postman, Thunder Client, or curl.
+### Using cURL
 
-**Example with curl:**
+**Register:**
 ```bash
-# Get all users
-curl http://localhost:3000/users
-
-# Create a new user
-curl -X POST http://localhost:3000/users \
+curl -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
-  -d '{"name":"Bilge"}'
-
-# Update a user
-curl -X PUT http://localhost:3000/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Bilge Nur"}'
-
-# Delete a user
-curl -X DELETE http://localhost:3000/users/1
-
-# Test validation error
-curl -X POST http://localhost:3000/users \
-  -H "Content-Type: application/json" \
-  -d '{"name":"A"}'
+  -d '{"name":"John Doe","email":"john@example.com","password":"password123"}'
 ```
+
+**Login:**
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john@example.com","password":"password123"}'
+```
+
+**Get Profile (Protected):**
+```bash
+curl -X GET http://localhost:3000/auth/me \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Delete User (Protected):**
+```bash
+curl -X DELETE http://localhost:3000/users/1 \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+### Using Postman / Thunder Client
+
+1. **Register** → POST `/auth/register` with JSON body
+2. **Login** → POST `/auth/login` → Copy the `token` from response
+3. **Protected Routes** → Add header: `Authorization: Bearer <token>`
 
 ## 🏗️ Architecture
 
-### Data Flow:
+### Request Flow
 ```
-Request → Logger → Route → Validation → Controller → Service → PostgreSQL
-                                ↓
-                          Error Handler (if error)
+Client Request
+    ↓
+Logger Middleware (logs request)
+    ↓
+Route Handler
+    ↓
+Authentication Middleware (if protected route)
+    ↓
+Validation Middleware
+    ↓
+Controller (handles request/response)
+    ↓
+Service (business logic + database queries)
+    ↓
+PostgreSQL Database
+    ↓
+Response (standardized format)
 ```
 
-### Layers:
+### Layer Responsibilities
 
 1. **Routes Layer** (`routes/`)
-   - Defines API endpoints
-   - Applies middleware to routes
-   - Maps URLs to controllers
+   - Define API endpoints
+   - Apply middleware to routes
+   - Map URLs to controllers
 
 2. **Middleware Layer** (`middlewares/`)
-   - **Logger**: Logs all requests with method, URL, status, and response time
-   - **Validation**: Validates input data before reaching controller
-   - **Error Handler**: Catches and formats all errors globally
+   - **authMiddleware**: JWT token verification
+   - **validateUser**: Input validation
+   - **logger**: Request logging
+   - **errorHandler**: Global error handling
 
 3. **Controller Layer** (`controllers/`)
-   - Handles HTTP request/response
-   - Performs input validation
-   - Calls appropriate service methods
-   - Returns standardized responses
-   - All methods are async (await service calls)
+   - Handle HTTP requests/responses
+   - Input validation
+   - Call service methods
+   - Return standardized responses
 
 4. **Service Layer** (`services/`)
-   - Contains business logic
-   - Executes database queries using parameterized statements
+   - Business logic
+   - Database operations
    - Independent of HTTP layer (reusable)
-   - Returns data or null
 
 5. **Database Layer** (`config/`)
    - PostgreSQL connection pool
-   - Connection error handling
-   - Environment-based configuration
-
-6. **Utils Layer** (`utils/`)
-   - Helper functions
-   - Response formatters
-
-## 🔒 Error Handling
-
-The application includes comprehensive error handling:
-
-- **Global Error Handler**: Catches all errors and returns consistent format
-- **404 Handler**: Returns proper response for undefined routes
-- **Validation Errors**: Returns 400 status with descriptive messages
-- **Not Found Errors**: Returns 404 status when resource doesn't exist
-- **Database Errors**: Caught and forwarded to error handler
-- **Try-Catch Blocks**: All async controllers wrapped in try-catch
+   - Connection management
 
 ## 🔐 Security Features
 
-- **SQL Injection Prevention**: Parameterized queries ($1, $2, etc.)
-- **Environment Variables**: Sensitive data in .env (not in git)
-- **Input Validation**: All user inputs validated before processing
-- **Data Sanitization**: Trimming whitespace, type checking
+### Implemented
+- ✅ **JWT Authentication** - Secure token-based auth
+- ✅ **Password Hashing** - bcrypt with salt rounds
+- ✅ **SQL Injection Prevention** - Parameterized queries
+- ✅ **Input Validation** - Type checking and sanitization
+- ✅ **Environment Variables** - Sensitive data in .env
+- ✅ **Error Message Sanitization** - No sensitive data in errors
+- ✅ **Token Expiration** - Configurable JWT expiry
+
+### Best Practices
+- Passwords never stored in plain text
+- Passwords never returned in API responses
+- Token required for protected routes
+- Unique email constraint
+- Request logging for monitoring
+
+## 🐳 Docker Commands
+
+### Start Services
+```bash
+docker-compose up -d
+```
+
+### Stop Services
+```bash
+docker-compose down
+```
+
+### View Logs
+```bash
+docker-compose logs -f api
+docker-compose logs -f db
+```
+
+### Rebuild After Code Changes
+```bash
+docker-compose down
+docker-compose up -d --build
+```
+
+### Access PostgreSQL Shell
+```bash
+docker exec -it postgres-db psql -U postgres -d appdb
+```
+
+### Database Backup
+```bash
+docker exec postgres-db pg_dump -U postgres appdb > backup.sql
+```
+
+### Database Restore
+```bash
+docker exec -i postgres-db psql -U postgres -d appdb < backup.sql
+```
 
 ## 📊 Request Logging
 
-Every request is automatically logged with:
-- HTTP Method (GET, POST, PUT, DELETE)
-- Request URL
-- Response Status Code
-- Response Time (in milliseconds)
-
-Example log output:
+Every request is automatically logged:
 ```
-✅ Connected to PostgreSQL database
-Server running on port 3000
-GET /users -> 200 (12ms)
-POST /users -> 201 (28ms)
-PUT /users/1 -> 200 (15ms)
-DELETE /users/999 -> 404 (8ms)
-```
-
-## 🐳 Docker Usage
-
-### Start PostgreSQL Container:
-```bash
-docker start glowup-postgres
-```
-
-### Stop PostgreSQL Container:
-```bash
-docker stop glowup-postgres
-```
-
-### View Container Logs:
-```bash
-docker logs glowup-postgres
-```
-
-### Access PostgreSQL Shell:
-```bash
-docker exec -it glowup-postgres psql -U postgres -d glowup_db
-```
-
-### Backup Database:
-```bash
-docker exec glowup-postgres pg_dump -U postgres glowup_db > backup.sql
-```
-
-### Restore Database:
-```bash
-docker exec -i glowup-postgres psql -U postgres -d glowup_db < backup.sql
+POST /auth/register 201 - 145ms
+POST /auth/login 200 - 89ms
+GET /auth/me 200 - 12ms
+PUT /users/1 200 - 34ms
+DELETE /users/1 401 - 5ms
 ```
 
 ## 🎯 Development Roadmap
 
 ### Completed ✅
 - [x] RESTful API design
-- [x] Controller-Service pattern
+- [x] MVC architecture (Controller-Service pattern)
+- [x] PostgreSQL database integration
+- [x] JWT authentication
+- [x] Password hashing (bcrypt)
+- [x] Protected routes
 - [x] Input validation middleware
 - [x] Global error handling
 - [x] Request logging
 - [x] Standardized responses
-- [x] **PostgreSQL database integration**
-- [x] **Environment variables**
-- [x] **Persistent data storage**
-- [x] **Docker setup**
+- [x] Docker Compose setup
+- [x] Environment variables
+- [x] SQL injection prevention
 
 ### In Progress 🔄
-- [ ] Authentication (JWT)
-- [ ] User roles and permissions
+- [ ] User roles and permissions (Admin/User)
+- [ ] Refresh token mechanism
+- [ ] Password reset functionality
 
 ### Planned 📋
+- [ ] Email verification
+- [ ] Rate limiting
+- [ ] CORS configuration
+- [ ] Helmet.js security headers
 - [ ] Advanced validation library (Joi/Zod)
 - [ ] Unit tests (Jest)
 - [ ] Integration tests
-- [ ] API documentation (Swagger)
-- [ ] Rate limiting
-- [ ] CORS configuration
-- [ ] Security headers (Helmet.js)
-- [ ] Password hashing (bcrypt)
-- [ ] Email service
-- [ ] File upload support
-- [ ] Pagination improvements
+- [ ] API documentation (Swagger/OpenAPI)
+- [ ] Pagination for list endpoints
 - [ ] Filtering and sorting
-- [ ] API versioning
-- [ ] Database migrations
-- [ ] Seeding scripts
+- [ ] File upload support
+- [ ] Redis for session management
+- [ ] CI/CD pipeline
+- [ ] Deployment guide (AWS/Heroku)
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please follow these steps:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
+
+## 📝 Environment Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| PORT | Server port | 3000 |
+| NODE_ENV | Environment | development |
+| DB_HOST | Database host | db (Docker) or localhost |
+| DB_PORT | Database port | 5432 |
+| DB_USER | Database user | postgres |
+| DB_PASSWORD | Database password | yourpassword |
+| DB_NAME | Database name | appdb |
+| JWT_SECRET | JWT signing secret | your-secret-key |
+| JWT_EXPIRES_IN | Token expiration | 7d |
+
+## 🐛 Troubleshooting
+
+### Issue: Container fails to start
+```bash
+# Check logs
+docker-compose logs api
+
+# Rebuild without cache
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+### Issue: Database connection error
+```bash
+# Check if database is running
+docker ps
+
+# Check database logs
+docker-compose logs db
+
+# Verify DB_HOST in .env (should be 'db' for Docker)
+```
+
+### Issue: JWT token errors
+- Ensure JWT_SECRET is set in .env
+- Check token format: `Authorization: Bearer <token>`
+- Verify token hasn't expired
 
 ## 👤 Developer
 
@@ -502,9 +732,21 @@ This project is licensed under the MIT License.
 - Express.js community
 - PostgreSQL team
 - Node.js contributors
+- JWT.io for JWT debugging
+- Docker community
 
 ---
 
-⭐ If you find this project helpful, please give it a star!
+⭐ **If you find this project helpful, please give it a star!**
 
-**Built with ❤️ using Node.js, Express.js, and PostgreSQL**
+**Built with ❤️ using Node.js, Express.js, PostgreSQL, JWT, and Docker**
+
+---
+
+## 📚 Additional Resources
+
+- [Express.js Documentation](https://expressjs.com/)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [JWT.io](https://jwt.io/)
+- [Docker Documentation](https://docs.docker.com/)
+- [bcrypt Documentation](https://www.npmjs.com/package/bcrypt)
