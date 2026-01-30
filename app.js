@@ -1,6 +1,19 @@
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const { apiLimiter } = require('./middlewares/rateLimiter');
 
 const app = express();
+
+app.use(helmet());
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+app.use(apiLimiter);
+
 app.use(express.json());
 
 const logger = require("./middlewares/logger");

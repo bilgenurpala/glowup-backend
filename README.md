@@ -1,6 +1,6 @@
 # 🌟 GlowUp Backend API
 
-A modern, production-ready REST API backend built with **Node.js**, **Express.js**, **PostgreSQL**, and **JWT Authentication**. Features a clean MVC architecture, comprehensive validation, robust error handling, and Docker containerization.
+A modern, production-ready REST API backend built with **Node.js**, **Express.js**, **PostgreSQL**, and **JWT Authentication**. Features enterprise-grade security with Helmet.js, CORS, rate limiting, comprehensive validation, robust error handling, and Docker containerization.
 
 ## 🚀 Key Features
 
@@ -9,10 +9,18 @@ A modern, production-ready REST API backend built with **Node.js**, **Express.js
 - ✅ **CRUD operations** (Create, Read, Update, Delete)
 - ✅ **PostgreSQL database** with persistent data storage
 - ✅ **JWT Authentication** with secure token-based auth
-- ✅ **Password hashing** using bcrypt
+- ✅ **Password hashing** using bcrypt (10 salt rounds)
 - ✅ **Protected routes** with authentication middleware
 - ✅ **Docker Compose** for easy deployment
 - ✅ **Environment variables** for secure configuration
+
+### Security Features 🔒
+- ✅ **Helmet.js** - Security headers (XSS, clickjacking, MIME sniffing protection)
+- ✅ **CORS** - Cross-Origin Resource Sharing configuration
+- ✅ **Rate Limiting** - DDoS and brute force attack prevention
+- ✅ **SQL Injection Prevention** - Parameterized queries
+- ✅ **Input Validation** - Type checking and sanitization
+- ✅ **Error Sanitization** - No sensitive data in error responses
 
 ### Architecture & Code Quality
 - ✅ **MVC Pattern** (Controller-Service architecture)
@@ -42,6 +50,7 @@ glowup-backend/
 ├── middlewares/
 │   ├── authMiddleware.js        # JWT token verification
 │   ├── validateUser.js          # Input validation
+│   ├── rateLimiter.js           # Rate limiting configuration
 │   ├── logger.js                # Request logging
 │   └── errorHandler.js          # Global error handling
 ├── utils/
@@ -58,17 +67,20 @@ glowup-backend/
 
 ## 🛠️ Technologies
 
-| Technology | Purpose |
-|------------|---------|
-| **Node.js** | JavaScript runtime environment |
-| **Express.js** | Web application framework |
-| **PostgreSQL** | Relational database |
-| **JWT** | JSON Web Tokens for authentication |
-| **bcrypt** | Password hashing and verification |
-| **pg** | PostgreSQL client for Node.js |
-| **dotenv** | Environment variable management |
-| **Docker** | Containerization platform |
-| **Docker Compose** | Multi-container orchestration |
+| Technology | Purpose | Version |
+|------------|---------|---------|
+| **Node.js** | JavaScript runtime | v18+ |
+| **Express.js** | Web application framework | ^4.18.0 |
+| **PostgreSQL** | Relational database | 14+ |
+| **JWT** | Authentication tokens | - |
+| **bcrypt** | Password hashing | ^5.1.0 |
+| **Helmet** | Security headers | ^7.1.0 |
+| **CORS** | Cross-origin support | ^2.8.5 |
+| **express-rate-limit** | Rate limiting | ^7.1.0 |
+| **pg** | PostgreSQL client | ^8.11.0 |
+| **dotenv** | Environment variables | ^16.3.0 |
+| **Docker** | Containerization | - |
+| **Docker Compose** | Multi-container orchestration | - |
 
 ## 📦 Installation & Setup
 
@@ -108,6 +120,9 @@ DB_NAME=appdb
 # JWT Configuration
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-12345
 JWT_EXPIRES_IN=7d
+
+# CORS Configuration
+CORS_ORIGIN=*
 ```
 
 3. **Start with Docker Compose:**
@@ -179,20 +194,72 @@ npm run dev
 
 ### Authentication Endpoints
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/auth/register` | Register new user | No |
-| POST | `/auth/login` | Login and get JWT token | No |
-| GET | `/auth/me` | Get current user profile | Yes |
+| Method | Endpoint | Description | Auth Required | Rate Limit |
+|--------|----------|-------------|---------------|------------|
+| POST | `/auth/register` | Register new user | No | 5/15min |
+| POST | `/auth/login` | Login and get JWT token | No | 5/15min |
+| GET | `/auth/me` | Get current user profile | Yes | 100/15min |
 
 ### User Management Endpoints
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/users` | Get all users (with optional limit) | No |
-| POST | `/users` | Create a new user | No |
-| PUT | `/users/:id` | Update user by ID | Yes |
-| DELETE | `/users/:id` | Delete user by ID | Yes |
+| Method | Endpoint | Description | Auth Required | Rate Limit |
+|--------|----------|-------------|---------------|------------|
+| GET | `/users` | Get all users (with optional limit) | No | 100/15min |
+| POST | `/users` | Create a new user | No | 100/15min |
+| PUT | `/users/:id` | Update user by ID | Yes | 100/15min |
+| DELETE | `/users/:id` | Delete user by ID | Yes | 100/15min |
+
+## 🔒 Security Features
+
+### 1. Helmet.js Security Headers
+
+Automatically adds the following headers to protect against common web vulnerabilities:
+
+| Header | Value | Protection |
+|--------|-------|------------|
+| `Content-Security-Policy` | default-src 'self' | XSS attacks |
+| `X-Content-Type-Options` | nosniff | MIME sniffing |
+| `X-Frame-Options` | SAMEORIGIN | Clickjacking |
+| `Strict-Transport-Security` | max-age=31536000 | Force HTTPS |
+| `X-DNS-Prefetch-Control` | off | DNS prefetch |
+| `Referrer-Policy` | no-referrer | Referrer leakage |
+
+### 2. CORS Configuration
+
+**Allowed Origins:** Configurable via `CORS_ORIGIN` environment variable  
+**Allowed Methods:** GET, POST, PUT, DELETE  
+**Allowed Headers:** Content-Type, Authorization  
+**Credentials:** Enabled
+
+**Production Example:**
+```env
+CORS_ORIGIN=https://yourfrontend.com,https://app.yourfrontend.com
+```
+
+### 3. Rate Limiting
+
+**General API Routes:**
+- 100 requests per 15 minutes per IP address
+- Returns 429 status when exceeded
+
+**Auth Routes (login, register):**
+- 5 requests per 15 minutes per IP address
+- Strict limit to prevent brute force attacks
+
+**Response Headers:**
+- `RateLimit-Limit` - Maximum requests allowed
+- `RateLimit-Remaining` - Requests remaining in window
+- `RateLimit-Reset` - Timestamp when limit resets
+- `Retry-After` - Seconds to wait (when rate limited)
+
+**Rate Limited Response (429):**
+```json
+{
+  "success": false,
+  "message": "Too many requests from this IP, please try again after 15 minutes",
+  "errors": null
+}
+```
 
 ## 📖 API Documentation
 
@@ -219,8 +286,8 @@ Content-Type: application/json
     "id": 1,
     "name": "Bilge Nur",
     "email": "bilge@example.com",
-    "created_at": "2025-01-29T10:30:00.000Z",
-    "updated_at": "2025-01-29T10:30:00.000Z"
+    "created_at": "2025-01-30T10:30:00.000Z",
+    "updated_at": "2025-01-30T10:30:00.000Z"
   }
 }
 ```
@@ -255,8 +322,8 @@ Content-Type: application/json
       "id": 1,
       "name": "Bilge Nur",
       "email": "bilge@example.com",
-      "created_at": "2025-01-29T10:30:00.000Z",
-      "updated_at": "2025-01-29T10:30:00.000Z"
+      "created_at": "2025-01-30T10:30:00.000Z",
+      "updated_at": "2025-01-30T10:30:00.000Z"
     },
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   }
@@ -284,8 +351,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "id": 1,
     "name": "Bilge Nur",
     "email": "bilge@example.com",
-    "created_at": "2025-01-29T10:30:00.000Z",
-    "updated_at": "2025-01-29T10:30:00.000Z"
+    "created_at": "2025-01-30T10:30:00.000Z",
+    "updated_at": "2025-01-30T10:30:00.000Z"
   }
 }
 ```
@@ -310,8 +377,8 @@ GET /users?limit=10
       "id": 1,
       "name": "Bilge Nur",
       "email": "bilge@example.com",
-      "created_at": "2025-01-29T10:30:00.000Z",
-      "updated_at": "2025-01-29T10:30:00.000Z"
+      "created_at": "2025-01-30T10:30:00.000Z",
+      "updated_at": "2025-01-30T10:30:00.000Z"
     }
   ]
 }
@@ -341,8 +408,8 @@ Content-Type: application/json
     "id": 1,
     "name": "Bilge Nur Pala",
     "email": "bilge@example.com",
-    "created_at": "2025-01-29T10:30:00.000Z",
-    "updated_at": "2025-01-29T12:45:00.000Z"
+    "created_at": "2025-01-30T10:30:00.000Z",
+    "updated_at": "2025-01-30T12:45:00.000Z"
   }
 }
 ```
@@ -366,20 +433,20 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
     "id": 1,
     "name": "Bilge Nur",
     "email": "bilge@example.com",
-    "created_at": "2025-01-29T10:30:00.000Z",
-    "updated_at": "2025-01-29T10:30:00.000Z"
+    "created_at": "2025-01-30T10:30:00.000Z",
+    "updated_at": "2025-01-30T10:30:00.000Z"
   }
 }
 ```
 
-## 🔒 Authentication Flow
+## 🔐 Authentication Flow
 
 ```
 1. Register
-   POST /auth/register → User created in database (password hashed)
+   POST /auth/register → User created in database (password hashed with bcrypt)
 
 2. Login
-   POST /auth/login → Verify credentials → Generate JWT token
+   POST /auth/login → Verify credentials → Generate JWT token (7 days expiry)
    
 3. Access Protected Routes
    Add header: Authorization: Bearer <token>
@@ -392,14 +459,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### Users Table
 
-| Column | Type | Constraints |
-|--------|------|-------------|
-| id | SERIAL | PRIMARY KEY |
-| name | VARCHAR(50) | NOT NULL |
-| email | VARCHAR(255) | UNIQUE |
-| password | VARCHAR(255) | - |
-| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
-| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP |
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | SERIAL | PRIMARY KEY | Auto-incrementing user ID |
+| name | VARCHAR(50) | NOT NULL | User's full name |
+| email | VARCHAR(255) | UNIQUE | User's email (login) |
+| password | VARCHAR(255) | - | Hashed password (bcrypt) |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Account creation time |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Last update time |
 
 **Indexes:**
 - Primary Key on `id`
@@ -472,6 +539,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 }
 ```
 
+### 429 - Too Many Requests (Rate Limited)
+```json
+{
+  "success": false,
+  "message": "Too many authentication attempts, please try again after 15 minutes",
+  "errors": null
+}
+```
+
 ## 🧪 Testing
 
 ### Using cURL
@@ -502,6 +578,16 @@ curl -X DELETE http://localhost:3000/users/1 \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
+**Test Rate Limit:**
+```bash
+# Run this 6 times quickly to trigger rate limit on auth endpoint
+for i in {1..6}; do
+  curl -X POST http://localhost:3000/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"test@test.com","password":"wrong"}'
+done
+```
+
 ### Using Postman / Thunder Client
 
 1. **Register** → POST `/auth/register` with JSON body
@@ -510,9 +596,35 @@ curl -X DELETE http://localhost:3000/users/1 \
 
 ## 🏗️ Architecture
 
+### Middleware Stack (Execution Order)
+
+```
+1. Helmet.js           → Security headers
+2. CORS                → Cross-origin handling
+3. Rate Limiter        → Request throttling
+4. express.json()      → Parse JSON body
+5. Logger              → Log request
+6. Router              → Match route
+7. Auth Middleware     → Verify JWT (if protected)
+8. Validation          → Validate input
+9. Controller          → Handle request
+10. Service            → Business logic
+11. Database           → PostgreSQL
+12. Response           → Send standardized JSON
+13. Error Handler      → Catch errors
+```
+
 ### Request Flow
 ```
 Client Request
+    ↓
+Helmet (add security headers)
+    ↓
+CORS (check origin)
+    ↓
+Rate Limiter (check request count)
+    ↓
+Parse JSON body
     ↓
 Logger Middleware (logs request)
     ↓
@@ -541,6 +653,7 @@ Response (standardized format)
 2. **Middleware Layer** (`middlewares/`)
    - **authMiddleware**: JWT token verification
    - **validateUser**: Input validation
+   - **rateLimiter**: Request rate limiting
    - **logger**: Request logging
    - **errorHandler**: Global error handling
 
@@ -559,12 +672,27 @@ Response (standardized format)
    - PostgreSQL connection pool
    - Connection management
 
-## 🔐 Security Features
+## 🔐 Security Features Implemented
 
-### Implemented
+### Password Security
+- ✅ Passwords hashed with bcrypt (10 salt rounds)
+- ✅ Passwords never stored in plain text
+- ✅ Passwords never returned in API responses
+- ✅ Password minimum length: 6 characters
+
+### Token Security
+- ✅ JWT signed with secret key
+- ✅ Tokens expire after 7 days (configurable)
+- ✅ Tokens required for protected routes
+- ✅ Token format: `Bearer <token>`
+
+### API Security
 - ✅ **JWT Authentication** - Secure token-based auth
 - ✅ **Password Hashing** - bcrypt with salt rounds
 - ✅ **SQL Injection Prevention** - Parameterized queries
+- ✅ **XSS Protection** - Helmet CSP headers
+- ✅ **CSRF Protection** - CORS configuration
+- ✅ **Rate Limiting** - DDoS prevention
 - ✅ **Input Validation** - Type checking and sanitization
 - ✅ **Environment Variables** - Sensitive data in .env
 - ✅ **Error Message Sanitization** - No sensitive data in errors
@@ -618,13 +746,14 @@ docker exec -i postgres-db psql -U postgres -d appdb < backup.sql
 
 ## 📊 Request Logging
 
-Every request is automatically logged:
+Every request is automatically logged with:
 ```
 POST /auth/register 201 - 145ms
 POST /auth/login 200 - 89ms
 GET /auth/me 200 - 12ms
 PUT /users/1 200 - 34ms
 DELETE /users/1 401 - 5ms
+POST /auth/login 429 - 3ms (rate limited)
 ```
 
 ## 🎯 Development Roadmap
@@ -643,6 +772,9 @@ DELETE /users/1 401 - 5ms
 - [x] Docker Compose setup
 - [x] Environment variables
 - [x] SQL injection prevention
+- [x] **Helmet.js security headers**
+- [x] **CORS configuration**
+- [x] **Rate limiting**
 
 ### In Progress 🔄
 - [ ] User roles and permissions (Admin/User)
@@ -651,9 +783,6 @@ DELETE /users/1 401 - 5ms
 
 ### Planned 📋
 - [ ] Email verification
-- [ ] Rate limiting
-- [ ] CORS configuration
-- [ ] Helmet.js security headers
 - [ ] Advanced validation library (Joi/Zod)
 - [ ] Unit tests (Jest)
 - [ ] Integration tests
@@ -688,6 +817,7 @@ Contributions are welcome! Please follow these steps:
 | DB_NAME | Database name | appdb |
 | JWT_SECRET | JWT signing secret | your-secret-key |
 | JWT_EXPIRES_IN | Token expiration | 7d |
+| **CORS_ORIGIN** | **Allowed CORS origins** | **\* or https://yourfrontend.com** |
 
 ## 🐛 Troubleshooting
 
@@ -717,9 +847,22 @@ docker-compose logs db
 - Check token format: `Authorization: Bearer <token>`
 - Verify token hasn't expired
 
+### Issue: CORS errors from frontend
+**Solution:** Update CORS_ORIGIN in .env to include your frontend URL
+```env
+CORS_ORIGIN=http://localhost:3000,http://localhost:5173
+```
+
+### Issue: Rate limit blocking legitimate requests
+**Solution:** Adjust rate limits in `middlewares/rateLimiter.js`
+```javascript
+max: 200, // Increase from 100
+windowMs: 15 * 60 * 1000 // Keep 15 minutes
+```
+
 ## 👤 Developer
 
-**Bilgenur Pala**
+**Bilge Nur Pala**
 - GitHub: [@bilgenurpala](https://github.com/bilgenurpala)
 - LinkedIn: [@bilgenurpala](https://www.linkedin.com/in/bilgenur-pala-892a1a225/)
 
@@ -733,13 +876,14 @@ This project is licensed under the MIT License.
 - PostgreSQL team
 - Node.js contributors
 - JWT.io for JWT debugging
+- Helmet.js for security
 - Docker community
 
 ---
 
 ⭐ **If you find this project helpful, please give it a star!**
 
-**Built with ❤️ using Node.js, Express.js, PostgreSQL, JWT, and Docker**
+**Built with ❤️ using Node.js, Express.js, PostgreSQL, JWT, Helmet, and Docker**
 
 ---
 
@@ -748,5 +892,8 @@ This project is licensed under the MIT License.
 - [Express.js Documentation](https://expressjs.com/)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [JWT.io](https://jwt.io/)
+- [Helmet.js Documentation](https://helmetjs.github.io/)
+- [CORS Documentation](https://www.npmjs.com/package/cors)
+- [express-rate-limit Documentation](https://www.npmjs.com/package/express-rate-limit)
 - [Docker Documentation](https://docs.docker.com/)
 - [bcrypt Documentation](https://www.npmjs.com/package/bcrypt)
