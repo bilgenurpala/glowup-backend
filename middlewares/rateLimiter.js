@@ -1,7 +1,7 @@
 const rateLimit = require('express-rate-limit');
 
 const apiLimiter = rateLimit({
-    windowsMs: 15 * 60 * 1000,
+    windowMs: 15 * 60 * 1000,
     max: 100,
     message: {
         success: false,
@@ -13,7 +13,7 @@ const apiLimiter = rateLimit({
 });
 
 const authLimiter = rateLimit({
-    windowsMs: 15 * 60 * 1000,
+    windowMs: 15 * 60 * 1000,
     max: 5,
     message: {
         success: false,

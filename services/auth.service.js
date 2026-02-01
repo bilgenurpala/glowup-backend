@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const pool = require('../config/database');
+const tokenService = require('./token.service');
 
 const SALT_ROUNDS = 10;
 
@@ -39,17 +39,17 @@ const login = async (email, password) => {
         throw new Error('Invalid email or password');
     }
 
-    const token = jwt.sign(
-        {userId: user.id, email: user.email },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || '7d'}
-    );
+    const accessToken = tokenService.generateAccessToken(user.id, user.email);
+    const refreshToken = tokenService.generateRefreshToken(user.id, user.email);
+
+    await tokenService.saveRefreshToken(user.id, refreshToken);
 
     const { password: _, ...userWithoutPassword } = user;
 
     return {
         user: userWithoutPassword,
-        token
+        accessToken,
+        refreshToken
     };
 };
 
