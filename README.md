@@ -1,4 +1,4 @@
-# 🌟 GlowUp Backend API
+# 🌟 GlowUp Backend API (User Management APIs)
 
 A modern, production-ready REST API backend built with **Node.js**, **Express.js**, **PostgreSQL**, and **JWT Authentication**. Features enterprise-grade security with Helmet.js, CORS, rate limiting, Joi validation, refresh token mechanism, comprehensive error handling, and interactive Swagger documentation.
 
