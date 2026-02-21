@@ -32,6 +32,10 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customSiteTitle: 'GlowUp API Docs',
 }));
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ success: true, message: 'OK' });
+});
+
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
 
