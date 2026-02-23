@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+
+* { font-family: 'Space Grotesk', sans-serif !important; }
+body { background: #FAFAF0 !important; }
+
+.swagger-ui { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+.swagger-ui .info { margin-bottom: 40px; }
+.swagger-ui .info .title {
+  font-size: 36px !important; font-weight: 800 !important; letter-spacing: -1px !important;
+  color: #0D0D0D !important; background: #FFE500 !important; border: 3px solid #0D0D0D !important;
+  padding: 6px 20px !important; display: inline-block !important; box-shadow: 5px 5px 0px #0D0D0D !important;
+}
+
+.swagger-ui .info p,
+.swagger-ui .info li,
+.swagger-ui .info table,
+.swagger-ui .info td,
+.swagger-ui .info .description p,
+.swagger-ui .info .renderedMarkdown p { color: #0D0D0D !important; font-weight: 600 !important; font-size: 15px !important; }
+
+.swagger-ui .info__contact,
+.swagger-ui .info__license { display: none !important; }
+
+.swagger-ui .scheme-container {
+  background: #fff !important; border: 3px solid #0D0D0D !important;
+  border-radius: 12px !important; box-shadow: 5px 5px 0px #0D0D0D !important;
+  padding: 16px 20px !important; margin-bottom: 28px !important;
+}
+
+.swagger-ui label { color: #0D0D0D !important; font-weight: 800 !important; }
+.swagger-ui .servers select { color: #0D0D0D !important; font-weight: 600 !important; }
+
+.swagger-ui .opblock-tag {
+  background: #0D0D0D !important; border: 3px solid #0D0D0D !important;
+  border-radius: 10px !important; box-shadow: 5px 5px 0px #555 !important;
+  font-size: 16px !important; font-weight: 800 !important;
+  color: #FFE500 !important; padding: 14px 20px !important;
+  letter-spacing: -0.3px !important; margin-bottom: 12px !important;
+}
+.swagger-ui .opblock-tag:hover { background: #222 !important; }
+.swagger-ui .opblock-tag small { color: #aaa !important; font-weight: 500 !important; font-size: 13px !important; }
+.swagger-ui .opblock-tag a span,
+.swagger-ui .opblock-tag span { color: #FFE500 !important; }
+
+.swagger-ui .opblock {
+  border: 3px solid #0D0D0D !important; border-radius: 12px !important;
+  box-shadow: 5px 5px 0px #0D0D0D !important; margin-bottom: 12px !important; overflow: hidden !important;
+}
+.swagger-ui .opblock:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0px #0D0D0D !important; transition: all 0.15s ease; }
+
+.swagger-ui .opblock.opblock-get .opblock-summary { background: #E0F8FF !important; }
+.swagger-ui .opblock.opblock-post .opblock-summary { background: #E8FFE8 !important; }
+.swagger-ui .opblock.opblock-put .opblock-summary { background: #FFFBE0 !important; }
+.swagger-ui .opblock.opblock-delete .opblock-summary { background: #FFE8E8 !important; }
+
+.swagger-ui .opblock-summary-method {
+  border-radius: 8px !important; font-weight: 800 !important;
+  font-size: 13px !important; border: 2px solid #0D0D0D !important;
+  box-shadow: 2px 2px 0px #0D0D0D !important; min-width: 80px !important;
+}
+.swagger-ui .opblock.opblock-get .opblock-summary-method { background: #4ECDC4 !important; color: #0D0D0D !important; }
+.swagger-ui .opblock.opblock-post .opblock-summary-method { background: #A8E6CF !important; color: #0D0D0D !important; }
+.swagger-ui .opblock.opblock-put .opblock-summary-method { background: #FFE500 !important; color: #0D0D0D !important; }
+.swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #FF6B6B !important; color: #fff !important; }
+
+.swagger-ui .opblock-summary-path { font-weight: 700 !important; font-size: 15px !important; color: #0D0D0D !important; }
+.swagger-ui .opblock-summary-description { font-weight: 500 !important; color: #333 !important; }
+.swagger-ui .opblock-body { background: #fff !important; }
+
+.swagger-ui .parameter__name,
+.swagger-ui .parameter__type,
+.swagger-ui table tbody tr td,
+.swagger-ui .response-col_status,
+.swagger-ui .response-col_description p { color: #0D0D0D !important; font-weight: 600 !important; }
+
+.swagger-ui table thead tr td,
+.swagger-ui table thead tr th {
+  font-weight: 800 !important; font-size: 12px !important; color: #0D0D0D !important;
+  text-transform: uppercase !important; letter-spacing: 1px !important;
+  border-bottom: 3px solid #0D0D0D !important; background: #f5f5e8 !important;
+}
+
+.swagger-ui .btn {
+  border: 3px solid #0D0D0D !important; border-radius: 8px !important;
+  font-weight: 700 !important; box-shadow: 3px 3px 0px #0D0D0D !important;
+  transition: all 0.15s ease !important;
+}
+.swagger-ui .btn:hover { transform: translate(-2px, -2px) !important; box-shadow: 5px 5px 0px #0D0D0D !important; }
+.swagger-ui .btn.execute { background: #0D0D0D !important; color: #FFE500 !important; }
+.swagger-ui .btn.btn-clear { background: #FF6B6B !important; color: #fff !important; }
+.swagger-ui .btn.authorize { background: #FFE500 !important; color: #0D0D0D !important; }
+
+.swagger-ui input[type=text],
+.swagger-ui textarea,
+.swagger-ui select {
+  border: 3px solid #0D0D0D !important; border-radius: 8px !important;
+  font-weight: 500 !important; box-shadow: 3px 3px 0px #0D0D0D !important;
+  background: #fff !important; color: #0D0D0D !important;
+}
+
+.swagger-ui section.models {
+  border: 3px solid #0D0D0D !important; border-radius: 12px !important;
+  box-shadow: 5px 5px 0px #0D0D0D !important; background: #fff !important; overflow: hidden !important;
+}
+.swagger-ui section.models h4 {
+  font-weight: 800 !important; color: #FFE500 !important; font-size: 16px !important;
+  background: #0D0D0D !important; padding: 14px 20px !important; margin: 0 !important;
+}
+.swagger-ui section.models h4 span,
+.swagger-ui section.models h4 svg { color: #FFE500 !important; fill: #FFE500 !important; }
+.swagger-ui section.models .model-container {
+  border: 2px solid #0D0D0D !important; border-radius: 8px !important;
+  background: #f5f5e8 !important; margin: 12px !important;
+}
+.swagger-ui .model-title__text { font-weight: 800 !important; color: #0D0D0D !important; font-size: 15px !important; }
+.swagger-ui table.model tr.property-row td { color: #0D0D0D !important; font-weight: 500 !important; }
+.swagger-ui .prop-type { color: #4ECDC4 !important; font-weight: 700 !important; }
+.swagger-ui .prop-format { color: #FF9A3C !important; font-weight: 600 !important; }
+.swagger-ui .model-toggle { opacity: 1 !important; }
+
+.swagger-ui .dialog-ux .modal-ux {
+  border: 4px solid #0D0D0D !important; border-radius: 12px !important;
+  box-shadow: 8px 8px 0px #0D0D0D !important; background: #FAFAF0 !important; overflow: hidden !important;
+}
+.swagger-ui .dialog-ux .modal-ux-header {
+  background: #0D0D0D !important; border-bottom: 3px solid #0D0D0D !important; padding: 20px 24px !important;
+}
+.swagger-ui .dialog-ux .modal-ux-header h3 {
+  color: #FFE500 !important; font-weight: 800 !important; font-size: 20px !important;
+}
+.swagger-ui .dialog-ux .modal-ux-header .close-modal svg { fill: #FFE500 !important; }
+.swagger-ui .dialog-ux .modal-ux-content { padding: 24px !important; }
+.swagger-ui .dialog-ux .modal-ux-content p,
+.swagger-ui .dialog-ux .modal-ux-content h4 { color: #0D0D0D !important; font-weight: 700 !important; }
+.swagger-ui .auth-container {
+  border: 2px solid #0D0D0D !important; border-radius: 8px !important;
+  background: #fff !important; padding: 20px !important;
+  box-shadow: 3px 3px 0px #0D0D0D !important; margin-bottom: 16px !important;
+}
+.swagger-ui .auth-container code {
+  background: #f5f5e8 !important; border: 2px solid #0D0D0D !important;
+  border-radius: 6px !important; padding: 2px 8px !important; color: #0D0D0D !important;
+}

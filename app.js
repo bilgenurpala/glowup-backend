@@ -1,6 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
+const path = require('path');
 const logger = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
 const userRoutes = require('./routes/user.routes');
@@ -12,7 +13,16 @@ const swaggerSpec = require('./config/swagger');
 
 const app = express();
 
-app.use(helmet());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'login.html')));
+app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
+app.get('/dashboard.html', (req, res) => res.sendFile(path.join(__dirname, 'public', 'dashboard.html')));
+
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
 
 app.use(cors({
   origin: process.env.CORS_ORIGIN || '*',
@@ -27,8 +37,10 @@ app.use(express.json());
 
 app.use(logger);
 
+
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
+  customCssUrl: '/css/swagger.css',
   customSiteTitle: 'GlowUp API Docs',
 }));
 

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GlowUp — API Platform</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    body { overflow-x: hidden; }
+
+    .hero {
+      min-height: 100vh;
+      padding: 120px 60px 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .hero-left { position: relative; z-index: 1; }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      background: var(--teal);
+      border: var(--border);
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 28px;
+      animation: bounce-in 0.5s ease;
+    }
+
+    .hero-title {
+      font-size: clamp(52px, 6vw, 80px);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeInUp 0.5s 0.1s ease both;
+    }
+
+    .hero-title .highlight {
+      background: var(--yellow);
+      border: var(--border);
+      padding: 0 8px;
+      display: inline;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-subtitle {
+      font-size: 18px;
+      font-weight: 500;
+      color: #444;
+      margin-bottom: 40px;
+      line-height: 1.6;
+      max-width: 480px;
+      animation: fadeInUp 0.5s 0.2s ease both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.5s 0.3s ease both;
+    }
+
+    .hero-actions .btn { padding: 16px 36px; font-size: 16px; }
+
+    .hero-right {
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 0.6s 0.2s ease both;
+    }
+
+    .hero-card {
+      background: var(--white);
+      border: var(--border-thick);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .hero-card-header {
+      background: var(--black);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .dot-red { background: #FF5F57; }
+    .dot-yellow { background: #FFBD2E; }
+    .dot-green { background: #28C840; }
+
+    .hero-card-body { padding: 24px; }
+
+    .code-line {
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      line-height: 2;
+      color: #333;
+    }
+
+    .code-method { color: #FF6B6B; font-weight: 700; }
+    .code-path { color: #4ECDC4; font-weight: 600; }
+    .code-status { color: #28C840; font-weight: 700; }
+    .code-comment { color: #999; }
+
+    .response-box {
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--bg);
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .key { color: var(--coral); }
+    .val-str { color: #4ECDC4; }
+    .val-bool { color: var(--orange); font-weight: 700; }
+
+    .features-section {
+      padding: 80px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      padding: 6px 18px;
+      background: var(--purple);
+      border: var(--border);
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      padding: 32px 28px;
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border: var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .feature-icon-1 { background: var(--yellow); }
+    .feature-icon-2 { background: var(--teal); }
+    .feature-icon-3 { background: var(--coral); }
+    .feature-icon-4 { background: var(--purple); }
+    .feature-icon-5 { background: var(--mint); }
+    .feature-icon-6 { background: var(--orange); }
+
+    .feature-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.7;
+      font-weight: 500;
+    }
+
+    .divider-section {
+      border-top: var(--border-thick);
+      border-bottom: var(--border-thick);
+      background: var(--teal);
+      padding: 20px 60px;
+      overflow: hidden;
+    }
+
+    .ticker {
+      display: flex;
+      gap: 60px;
+      animation: ticker 15s linear infinite;
+      width: max-content;
+    }
+
+    .ticker-item {
+      font-size: 16px;
+      font-weight: 800;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .ticker-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--black);
+      flex-shrink: 0;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .cta-section {
+      padding: 80px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .cta-card {
+      padding: 72px;
+      background: var(--black);
+      border: var(--border-thick);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-card::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      background: var(--yellow);
+      border-radius: 50%;
+      opacity: 0.15;
+    }
+
+    .cta-title {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-title .highlight {
+      background: var(--yellow);
+      color: var(--black);
+      padding: 0 8px;
+    }
+
+    .cta-sub {
+      font-size: 16px;
+      color: #aaa;
+      margin-bottom: 40px;
+      font-weight: 500;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer {
+      border-top: var(--border-thick);
+      background: var(--yellow);
+      padding: 24px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .deco-circle {
+      position: fixed;
+      border-radius: 50%;
+      border: var(--border-thick);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .deco-star {
+      position: fixed;
+      font-size: 40px;
+      pointer-events: none;
+      z-index: 0;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 100px 24px 60px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .features-section, .cta-section { padding: 60px 24px; }
+      .footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <span class="deco-star" style="top: 120px; right: 80px; animation-delay: 0s;">⭐</span>
+  <span class="deco-star" style="top: 300px; left: 40px; animation-delay: 1s; font-size: 28px;">✦</span>
+  <span class="deco-star" style="bottom: 200px; right: 120px; animation-delay: 2s; font-size: 32px;">★</span>
+
+  <nav class="nav">
+    <span class="nav-logo">✦ GlowUp</span>
+    <div class="nav-links">
+      <a href="/login.html" class="btn btn-ghost">Sign In</a>
+      <a href="/register.html" class="btn btn-dark">Get Started →</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-tag">🚀 Modern API Platform</div>
+      <h1 class="hero-title">
+        The API that<br />
+        makes you<br />
+        <span class="highlight">glow up.</span>
+      </h1>
+      <p class="hero-subtitle">
+        JWT authentication, user management, and real-time API testing. Built for developers who want things done right.
+      </p>
+      <div class="hero-actions">
+        <a href="/register.html" class="btn btn-primary">Get Started Free →</a>
+        <a href="/api-docs" target="_blank" class="btn btn-ghost">View Docs</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-card">
+        <div class="hero-card-header">
+          <div class="dot dot-red"></div>
+          <div class="dot dot-yellow"></div>
+          <div class="dot dot-green"></div>
+          <span style="color:#aaa; font-family: monospace; font-size: 13px; margin-left: 8px;">api.glowup.dev</span>
+        </div>
+        <div class="hero-card-body">
+          <div class="code-line"><span class="code-method">POST</span> <span class="code-path">/auth/login</span> <span class="code-status">200 OK</span></div>
+          <div class="code-line"><span class="code-comment">// Response</span></div>
+          <div class="response-box">
+            <div><span class="key">"success"</span>: <span class="val-bool">true</span>,</div>
+            <div><span class="key">"message"</span>: <span class="val-str">"Login successful"</span>,</div>
+            <div><span class="key">"data"</span>: {</div>
+            <div>&nbsp;&nbsp;<span class="key">"accessToken"</span>: <span class="val-str">"eyJhbG..."</span>,</div>
+            <div>&nbsp;&nbsp;<span class="key">"refreshToken"</span>: <span class="val-str">"eyJhbG..."</span></div>
+            <div>}</div>
+          </div>
+          <div style="margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="badge badge-teal">JWT Auth</span>
+            <span class="badge badge-yellow">Rate Limited</span>
+            <span class="badge badge-purple">Swagger Docs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-section">
+    <div class="ticker">
+      <div class="ticker-item"><div class="ticker-dot"></div> JWT Authentication</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> User Management</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> Rate Limiting</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> Swagger Docs</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> Docker Ready</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> PostgreSQL</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> REST API</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> JWT Authentication</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> User Management</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> Rate Limiting</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> Swagger Docs</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> Docker Ready</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> PostgreSQL</div>
+      <div class="ticker-item"><div class="ticker-dot"></div> REST API</div>
+    </div>
+  </div>
+
+  <section class="features-section">
+    <div class="section-header">
+      <div class="section-tag">⚡ Features</div>
+      <h2 class="section-title">Everything you need,<br />nothing you don't.</h2>
+    </div>
+    <div class="features-grid">
+      <div class="card feature-card">
+        <div class="feature-icon feature-icon-1">🔐</div>
+        <div class="feature-title">JWT Authentication</div>
+        <div class="feature-desc">Access & refresh token system with automatic rotation. Secure by design.</div>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon feature-icon-2">👥</div>
+        <div class="feature-title">User Management</div>
+        <div class="feature-desc">Full CRUD operations with validation, pagination, and protected routes.</div>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon feature-icon-3">🛡️</div>
+        <div class="feature-title">Enterprise Security</div>
+        <div class="feature-desc">Helmet, CORS, rate limiting, bcrypt hashing, SQL injection prevention.</div>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon feature-icon-4">📄</div>
+        <div class="feature-title">Swagger Docs</div>
+        <div class="feature-desc">Interactive API documentation with try-it-out for every endpoint.</div>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon feature-icon-5">🐳</div>
+        <div class="feature-title">Docker Ready</div>
+        <div class="feature-desc">One command deployment. PostgreSQL included. Zero config needed.</div>
+      </div>
+      <div class="card feature-card">
+        <div class="feature-icon feature-icon-6">⚡</div>
+        <div class="feature-title">High Performance</div>
+        <div class="feature-desc">Express.js with connection pooling and optimized database queries.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-card">
+      <h2 class="cta-title">Ready to <span class="highlight">glow up?</span></h2>
+      <p class="cta-sub">Create your account and start managing users in seconds.</p>
+      <div class="cta-btns">
+        <a href="/register.html" class="btn btn-primary" style="padding: 16px 40px; font-size: 16px;">Create Account →</a>
+        <a href="/login.html" class="btn btn-ghost" style="padding: 16px 40px; font-size: 16px;">Sign In</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>✦ GlowUp API</span>
+    <span>Built with Node.js, Express & PostgreSQL</span>
+    <span>© 2026</span>
+  </footer>
+
+  <script src="/js/api.js"></script>
+  <script>redirectIfAuth();</script>
+</body>
+</html>

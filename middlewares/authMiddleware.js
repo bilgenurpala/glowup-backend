@@ -6,7 +6,7 @@ const authenticateToken = (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        return fail(res, 401, 'Access token is missing or invalid');
+        return fail(res, 'Access token is missing or invalid', 401);
     }
 
     try{
@@ -15,9 +15,9 @@ const authenticateToken = (req, res, next) => {
         next();
     } catch (err) {
         if (err.name === 'TokenExpiredError') {
-            return fail(res, 401, 'Access token has expired');
+            return fail(res, 'Access token has expired', 401);
         }
-        return fail(res, 403, 'Invalid or expired token');  
+        return fail(res, 'Invalid or expired token', 403);
     }
 };
 module.exports = authenticateToken;

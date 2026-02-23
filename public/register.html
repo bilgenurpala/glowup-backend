@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — GlowUp</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .deco-block {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .auth-wrapper {
+      width: 100%;
+      max-width: 460px;
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 0.4s ease both;
+    }
+
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .auth-logo a {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--black);
+      letter-spacing: -1px;
+    }
+
+    .auth-card {
+      padding: 44px 40px;
+      position: relative;
+    }
+
+    .auth-card-accent {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      bottom: -8px;
+      left: -8px;
+      background: var(--coral);
+      border: var(--border-thick);
+      border-radius: var(--radius);
+      z-index: -1;
+    }
+
+    .auth-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--mint);
+      border: var(--border);
+      border-radius: 100px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 16px;
+    }
+
+    .auth-title {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 6px;
+      line-height: 1.1;
+    }
+
+    .auth-subtitle {
+      font-size: 14px;
+      color: #555;
+      font-weight: 500;
+      margin-bottom: 32px;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      margin-top: 4px;
+      background: var(--black);
+      color: var(--white);
+    }
+
+    .password-hint {
+      font-size: 12px;
+      color: #777;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .auth-footer {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+    }
+
+    .auth-footer a {
+      color: var(--black);
+      font-weight: 800;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .auth-footer a:hover {
+      background: var(--mint);
+    }
+
+    .perks {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .perk {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border: var(--border);
+      border-radius: 100px;
+      background: var(--white);
+      box-shadow: var(--shadow-sm);
+    }
+  </style>
+</head>
+<body>
+  <span class="deco-block" style="top: 60px; right: 60px; animation: float 5s ease-in-out infinite;">
+    <svg width="60" height="60" viewBox="0 0 60 60"><polygon points="30,5 55,50 5,50" fill="#FF6B6B" stroke="#0D0D0D" stroke-width="3"/></svg>
+  </span>
+  <span class="deco-block" style="bottom: 80px; left: 80px; animation: floatReverse 6s ease-in-out infinite;">
+    <svg width="50" height="50" viewBox="0 0 50 50"><rect x="5" y="5" width="40" height="40" fill="#A8E6CF" stroke="#0D0D0D" stroke-width="3" rx="8"/></svg>
+  </span>
+  <span class="deco-block" style="top: 160px; left: 120px; animation: wiggle 3s ease-in-out infinite; font-size: 36px;">⭐</span>
+  <span class="deco-block" style="bottom: 180px; right: 100px; animation: float 4s ease-in-out infinite; animation-delay: 2s; font-size: 28px;">✦</span>
+
+  <div class="auth-wrapper">
+    <div class="auth-logo">
+      <a href="/">✦ GlowUp</a>
+    </div>
+
+    <div class="card auth-card">
+      <div class="auth-card-accent"></div>
+      <div class="auth-eyebrow">🚀 Get started free</div>
+      <h1 class="auth-title">Create your<br />account</h1>
+      <p class="auth-subtitle">Join GlowUp and start managing your API</p>
+
+      <div class="perks">
+        <span class="perk">✓ Free forever</span>
+        <span class="perk">✓ JWT Auth</span>
+        <span class="perk">✓ Full API access</span>
+      </div>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <form class="auth-form" id="registerForm">
+        <div class="input-group">
+          <label for="name">Full name</label>
+          <input
+            type="text"
+            id="name"
+            class="input-field"
+            placeholder="John Doe"
+            required
+            autocomplete="name"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email address</label>
+          <input
+            type="email"
+            id="email"
+            class="input-field"
+            placeholder="you@example.com"
+            required
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            class="input-field"
+            placeholder="••••••••"
+            required
+            autocomplete="new-password"
+          />
+          <p class="password-hint">Min. 6 characters with uppercase, lowercase &amp; number</p>
+        </div>
+
+        <button type="submit" class="btn btn-submit" id="submitBtn">
+          Create Account →
+        </button>
+      </form>
+    </div>
+
+    <div class="auth-footer">
+      Already have an account? <a href="/login.html">Sign in</a>
+    </div>
+  </div>
+
+  <script src="/js/api.js"></script>
+  <script>
+    redirectIfAuth();
+
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+
+    const showError = (msg) => {
+      errorMsg.textContent = msg;
+      errorMsg.style.display = 'block';
+    };
+
+    const hideError = () => {
+      errorMsg.style.display = 'none';
+    };
+
+    const setLoading = (loading) => {
+      submitBtn.disabled = loading;
+      submitBtn.innerHTML = loading
+        ? '<div class="spinner"></div>'
+        : 'Create Account →';
+    };
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideError();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      setLoading(true);
+
+      try {
+        await api.register(name, email, password);
+        showToast('Account created! Signing you in...');
+        const loginRes = await api.login(email, password);
+        setTokens(loginRes.data.accessToken, loginRes.data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(loginRes.data.user));
+        setTimeout(() => window.location.href = '/dashboard.html', 600);
+      } catch (err) {
+        showError(err.message);
+        setLoading(false);
+      }
+    });
+  </script>
+</body>
+</html>
